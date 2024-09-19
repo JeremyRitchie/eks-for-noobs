@@ -9,3 +9,16 @@ data "terraform_remote_state" "eks" {
     }
   }
 }
+
+data "kubectl_path_documents" "application_2048" {
+    pattern = "${path.module}/manifests/2048/*.yaml"
+}
+
+data "aws_lb" "application_2048" {
+  name = "jeremyritchie-demo-eks-alb"
+  depends_on = [ time_sleep.wait_for_app ]
+}
+
+data "aws_route53_zone" "primary" {
+  name = "jeremyritchie.com"
+}

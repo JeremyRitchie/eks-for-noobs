@@ -18,12 +18,16 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/load-balancer-name: jeremyritchie-demo-eks-alb
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
     alb.ingress.kubernetes.io/subnets: eks-demo-public-us-east-1a, eks-demo-public-us-east-1b, eks-demo-public-us-east-1c
     alb.ingress.kubernetes.io/actions.forward-to-service: >
       {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"service-2048","servicePort":"service-port"}]}}
     alb.ingress.kubernetes.io/healthcheck-path: /
 spec:
+  tls:
+    - hosts:
+        - "2048.jeremyritchie.com"
   rules:
     - http:
         paths:

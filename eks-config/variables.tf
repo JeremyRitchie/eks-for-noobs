@@ -37,3 +37,7 @@ variable "cluster_desired_size" {
   type        = number
   description = "Desired number of EKS nodes"
 }
+
+variable "domain_name" {
+  type = string
+}

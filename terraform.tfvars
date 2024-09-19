@@ -1,5 +1,6 @@
 environment = "demo"
 account_name = "jeremyritchie"
+domain_name  = "jeremyritchie.com"
 
 cluster_name    = "jeremyritchie-demo-eks"
 cluster_version = "1.30"
