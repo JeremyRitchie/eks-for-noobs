@@ -15,13 +15,18 @@ module "eks" {
       most_recent    = true
       configuration_values = jsonencode({
         env = {
-          ENABLE_POD_ENI                     = "true"
+          // Deploy Pods to different subnet than nodes
           AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG = "true"
-          AWS_VPC_K8S_CNI_EXTERNALSNAT       = "true"
-          POD_SECURITY_GROUP_ENFORCING_MODE  = "standard"
           ENI_CONFIG_LABEL_DEF               = "topology.kubernetes.io/zone"
+          // Every Pod will have its own IP & Security Group
+          ENABLE_POD_ENI                     = "true"
+          // Allow pods to talk to internet
+          AWS_VPC_K8S_CNI_EXTERNALSNAT       = "true"
+          // Enable Prefix Delegation - allowocate IP prefix to Node ENI's instead of secondary IP's. Allow much higher pod density
           ENABLE_PREFIX_DELEGATION           = "true"
           WARM_PREFIX_TARGET                 = "1"
+          // network security mode
+          POD_SECURITY_GROUP_ENFORCING_MODE  = "standard"
         }
       })
     }

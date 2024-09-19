@@ -20,5 +20,5 @@ data "aws_lb" "application_2048" {
 }
 
 data "aws_route53_zone" "primary" {
-  name = "jeremyritchie.com"
+  name = var.domain_name
 }

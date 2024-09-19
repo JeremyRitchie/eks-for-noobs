@@ -1,34 +1,6 @@
-module "eks_blueprints_addons" {
-  source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.16" #ensure to update this to the latest/desired version
-
-  cluster_name      = data.terraform_remote_state.eks.outputs.eks.cluster_name
-  cluster_endpoint  = data.terraform_remote_state.eks.outputs.eks.cluster_endpoint
-  cluster_version   = data.terraform_remote_state.eks.outputs.eks.cluster_version
-  oidc_provider_arn = data.terraform_remote_state.eks.outputs.eks.oidc_provider_arn
-
-  enable_aws_load_balancer_controller = true
-  enable_external_secrets             = true
-  enable_cluster_autoscaler           = true
-  enable_metrics_server               = true
-
-  aws_load_balancer_controller = {
-    set = [
-      {
-        name  = "vpcId"
-        value = data.terraform_remote_state.eks.outputs.vpc.vpc_id
-      },
-      {
-        name  = "podDisruptionBudget.maxUnavailable"
-        value = 1
-      }
-    ]
-  }
-  tags = {
-    Environment = "${var.environment}"
-  }
-}
-
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Create a new ACM certificate for the 2048 application
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 resource "aws_acm_certificate" "application_2048" {
   domain_name       = "2048.${var.domain_name}"
   validation_method = "DNS"
@@ -56,6 +28,10 @@ resource "aws_acm_certificate_validation" "application_2048" {
   validation_record_fqdns = [for record in aws_route53_record.cert_2048 : record.fqdn]
 }
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Deploy the 2048 application
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 resource "kubectl_manifest" "application_2048" {
     for_each  = toset(data.kubectl_path_documents.application_2048.documents)
     yaml_body = each.value
@@ -64,6 +40,10 @@ resource "kubectl_manifest" "application_2048" {
       destroy_before_create = true
     }
 }
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Create a DNS record for the 2048 application
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 resource "time_sleep" "wait_for_app" {
   depends_on = [ kubectl_manifest.application_2048 ]
