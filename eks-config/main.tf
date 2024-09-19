@@ -16,7 +16,7 @@ module "eks_blueprints_addons" {
     set = [
       {
         name  = "vpcId"
-        value = data.aws_vpc.cluster_vpc.id
+        value = data.terraform_remote_state.eks.outputs.vpc.vpc_id
       },
       {
         name  = "podDisruptionBudget.maxUnavailable"
@@ -27,4 +27,14 @@ module "eks_blueprints_addons" {
   tags = {
     Environment = "${var.environment}"
   }
+}
+
+data "kubectl_path_documents" "application_2048" {
+    pattern = "${path.module}/manifests/2048/*.yaml"
+}
+
+resource "kubectl_manifest" "application_2048" {
+    for_each  = toset(data.kubectl_path_documents.application_2048.documents)
+    yaml_body = each.value
+    depends_on = [ module.eks_blueprints_addons ]
 }

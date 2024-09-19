@@ -1,1 +1,1 @@
-# techops-aws-market-prod
+# eks-for-noobs

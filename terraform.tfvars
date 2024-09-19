@@ -8,7 +8,7 @@ instance_types = ["m6a.large"]
 
 cluster_min_size     = 0
 cluster_max_size     = 2
-cluster_desired_size = 0
+cluster_desired_size = 1
 
 access_entries = {
   prod-account = {
