@@ -36,9 +36,6 @@ resource "kubectl_manifest" "application_2048" {
     for_each  = toset(data.kubectl_path_documents.application_2048.documents)
     yaml_body = each.value
     depends_on = [ module.eks_blueprints_addons, aws_acm_certificate_validation.application_2048 ]
-    lifecycle {
-      destroy_before_create = true
-    }
 }
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
